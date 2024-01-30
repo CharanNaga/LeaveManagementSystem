@@ -1,3 +1,4 @@
+using LeaveManagement.Web.Configurations;
 using LeaveManagement.Web.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,12 +6,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<Employee>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAutoMapper(typeof(MapperConfig)); //Adding customized automapper config class to the Ioc container
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
