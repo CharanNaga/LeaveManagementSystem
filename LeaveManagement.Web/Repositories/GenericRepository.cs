@@ -1,37 +1,61 @@
 ﻿using LeaveManagement.Web.Contracts;
+using LeaveManagement.Web.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Web.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        public Task<T> AddAsync(T entity)
+        private readonly ApplicationDbContext _db;
+
+        public GenericRepository(ApplicationDbContext db)
         {
-            throw new NotImplementedException();
+            _db = db;
         }
 
-        public Task DeleteAsync(int id)
+        public async Task<T> AddAsync(T entity)
         {
-            throw new NotImplementedException();
+            await _db.AddAsync(entity);
+            await _db.SaveChangesAsync();
+            return entity;
         }
 
-        public Task<List<T>> GetAllAsync()
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var entity = await GetAsync(id);
+            if(entity != null)
+            {
+                _db.Set<T>().Remove(entity);
+                await _db.SaveChangesAsync();
+            }
         }
 
-        public Task<T> GetAsync(int id)
+        public async Task<List<T>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _db.Set<T>().ToListAsync();
         }
 
-        public Task<bool> IfExists(int id)
+        public async Task<T?> GetAsync(int? id)
         {
-            throw new NotImplementedException();
+            var entity = await _db.Set<T>().FindAsync(id);
+            if(entity != null)
+            {
+                return entity;
+            }
+            return null;
         }
 
-        public Task UpdateAsync(T entity)
+        public async Task<bool> IfExists(int id)
         {
-            throw new NotImplementedException();
+            var entity = await GetAsync(id);
+            return entity != null;
+        }
+
+        public async Task UpdateAsync(T entity)
+        {
+            //_db.Entry(entity).State = EntityState.Modified;
+            _db.Update(entity);
+            await _db.SaveChangesAsync();
         }
     }
 }
