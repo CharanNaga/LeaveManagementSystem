@@ -22,8 +22,8 @@ namespace LeaveManagement.Web.Controllers
         public async Task<IActionResult> Index()
         {
               return _db.LeaveTypes != null ? 
-                          View(await _db.LeaveTypes.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.LeaveTypes'  is null.");
+                          View(await _db.LeaveTypes.ToListAsync()) :  /* select * from LeaveTypes; */
+                          Problem("Entity set 'ApplicationDbContext.LeaveTypes' is null.");
         }
 
         // GET: LeaveTypes/Details/5
@@ -35,7 +35,8 @@ namespace LeaveManagement.Web.Controllers
             }
 
             var leaveType = await _db.LeaveTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id);  /* select * from LeaveTypes where Id = 5; */
+
             if (leaveType == null)
             {
                 return NotFound();
@@ -75,6 +76,7 @@ namespace LeaveManagement.Web.Controllers
             }
 
             var leaveType = await _db.LeaveTypes.FindAsync(id);
+
             if (leaveType == null)
             {
                 return NotFound();
@@ -101,7 +103,7 @@ namespace LeaveManagement.Web.Controllers
                     _db.Update(leaveType);
                     await _db.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException) //Raises if two persons trying to update at the same time
                 {
                     if (!LeaveTypeExists(leaveType.Id))
                     {
@@ -127,6 +129,7 @@ namespace LeaveManagement.Web.Controllers
 
             var leaveType = await _db.LeaveTypes
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (leaveType == null)
             {
                 return NotFound();
@@ -142,9 +145,11 @@ namespace LeaveManagement.Web.Controllers
         {
             if (_db.LeaveTypes == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.LeaveTypes'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.LeaveTypes' is null.");
             }
+
             var leaveType = await _db.LeaveTypes.FindAsync(id);
+
             if (leaveType != null)
             {
                 _db.LeaveTypes.Remove(leaveType);
