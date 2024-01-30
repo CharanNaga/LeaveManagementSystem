@@ -1,29 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LeaveManagement.Web.Data;
+using AutoMapper;
+using LeaveManagement.Web.Models;
 
 namespace LeaveManagement.Web.Controllers
 {
     public class LeaveTypesController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly IMapper _mapper;
 
-        public LeaveTypesController(ApplicationDbContext db)
+        public LeaveTypesController(ApplicationDbContext db,IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
         // GET: LeaveTypes
         public async Task<IActionResult> Index()
         {
               return _db.LeaveTypes != null ? 
-                          View(await _db.LeaveTypes.ToListAsync()) :  /* select * from LeaveTypes; */
-                          Problem("Entity set 'ApplicationDbContext.LeaveTypes' is null.");
+                          View(
+                              _mapper.Map<List<LeaveTypeViewModel>>(        //To achieve SRP LeaveTypes is responsible for working with LeaveType data model. so we segregate data model & view model
+                                  await _db.LeaveTypes.ToListAsync()        /* select * from LeaveTypes; */
+                                  )
+                              ) 
+                          : Problem("Entity set 'ApplicationDbContext.LeaveTypes' is null.");
         }
 
         // GET: LeaveTypes/Details/5
