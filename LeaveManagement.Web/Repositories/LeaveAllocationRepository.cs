@@ -43,6 +43,24 @@ namespace LeaveManagement.Web.Repositories
             return employeeAllocationModel;
         }
 
+        public async Task<LeaveAllocationEditViewModel> GetEmployeeAllocation(int Id)
+        {
+            var allocation = await _db.LeaveAllocations
+                .Include(l => l.LeaveType) //equivalent to inner join two tables(LeaveTypes, LeaveAllocations) with a foreign key
+                .FirstOrDefaultAsync(l => l.Id == Id);
+
+            if(allocation == null)
+            {
+                return null;
+            }
+
+            var employee = await _userManager.FindByIdAsync(allocation.EmployeeId);
+
+            var leaveAllocationEditViewModel = _mapper.Map<LeaveAllocationEditViewModel>(allocation);
+            leaveAllocationEditViewModel.Employee = _mapper.Map<EmployeeListViewModel>(employee);
+            return leaveAllocationEditViewModel;
+        }
+
         public async Task LeaveAllocation(int leaveTypeId)
         {
             var employees = await _userManager.GetUsersInRoleAsync(Roles.User);
@@ -64,6 +82,19 @@ namespace LeaveManagement.Web.Repositories
                 });
             }
             await AddRangeAsync(allocations);
+        }
+
+        public async Task<bool> UpdateEmployeeAllocation(LeaveAllocationEditViewModel leaveAllocationEditViewModel)
+        {
+            var leaveAllocation = await GetAsync(leaveAllocationEditViewModel.Id);
+            if (leaveAllocation == null)
+            {
+                return false;
+            }
+            leaveAllocation.Period = leaveAllocationEditViewModel.Period;
+            leaveAllocation.NumberOfDays = leaveAllocationEditViewModel.NumberOfDays;
+            await UpdateAsync(leaveAllocation);
+            return true;
         }
     }
 }
