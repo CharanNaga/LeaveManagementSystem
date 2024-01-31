@@ -3,6 +3,7 @@ using LeaveManagement.Web.Constants;
 using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Models;
+using LeaveManagement.Web.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,14 @@ namespace LeaveManagement.Web.Controllers
         private readonly UserManager<Employee> _userManager;
         private readonly IMapper _mapper;
         private readonly ILeaveAllocationRepository _leaveAllocationRepository;
-        public EmployeesController(UserManager<Employee> userManager,IMapper mapper,ILeaveAllocationRepository leaveAllocationRepository)
+        private readonly ILeaveTypeRepository _leaveTypeRepository;
+        public EmployeesController(UserManager<Employee> userManager,IMapper mapper, ILeaveAllocationRepository leaveAllocationRepository, ILeaveTypeRepository leaveTypeRepository)
         {
             _userManager = userManager;
             _mapper = mapper;
             _leaveAllocationRepository = leaveAllocationRepository;
+            _leaveTypeRepository = leaveTypeRepository;
+
         }
 
         // GET: EmployeesController
@@ -36,67 +40,38 @@ namespace LeaveManagement.Web.Controllers
             return View(model);
         }
 
-        // GET: EmployeesController/Create
-        public ActionResult Create()
+
+        // GET: EmployeesController/EditAllocation/5
+        public async Task<ActionResult> EditAllocation(int id)
         {
-            return View();
+            var model = await _leaveAllocationRepository.GetEmployeeAllocation(id);
+            if(model == null)
+            {
+                return NotFound();
+            }
+            return View(model);
         }
 
-        // POST: EmployeesController/Create
+        // POST: EmployeesController/EditAllocation/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> EditAllocation(int id, LeaveAllocationEditViewModel leaveAllocationEditViewModel)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    if(await _leaveAllocationRepository.UpdateEmployeeAllocation(leaveAllocationEditViewModel))
+                        return RedirectToAction(nameof(ViewAllocations),new {id = leaveAllocationEditViewModel.EmployeeId});
+                }
             }
-            catch
+            catch(Exception)
             {
-                return View();
+                ModelState.AddModelError("Error Message", "Something went wrong. Check again");
             }
-        }
-
-        // GET: EmployeesController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: EmployeesController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: EmployeesController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: EmployeesController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            leaveAllocationEditViewModel.Employee = _mapper.Map<EmployeeListViewModel>(await _userManager.FindByIdAsync(leaveAllocationEditViewModel.EmployeeId));
+            leaveAllocationEditViewModel.LeaveType = _mapper.Map<LeaveTypeViewModel>(await _leaveTypeRepository.GetAsync(leaveAllocationEditViewModel.LeaveTypeId));
+            return View(leaveAllocationEditViewModel);
         }
     }
 }
