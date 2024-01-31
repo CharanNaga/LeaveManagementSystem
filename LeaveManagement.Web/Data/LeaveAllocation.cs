@@ -12,5 +12,7 @@ namespace LeaveManagement.Web.Data
 
         // Creating an another foreign key for Allocating Leave to particular Employee
         public string EmployeeId { get; set; }
+
+        public int Period { get; set; } //Determines no. of allocated leave days for this year
     }
 }
