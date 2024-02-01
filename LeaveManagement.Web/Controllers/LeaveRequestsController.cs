@@ -13,13 +13,11 @@ namespace LeaveManagement.Web.Controllers
     public class LeaveRequestsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ILeaveRequestRepository _leaveRequestRepository;
 
-        public LeaveRequestsController(ApplicationDbContext context, IMapper mapper, ILeaveRequestRepository leaveRequestRepository)
+        public LeaveRequestsController(ApplicationDbContext context, ILeaveRequestRepository leaveRequestRepository)
         {
             _context = context;
-            _mapper = mapper;
             _leaveRequestRepository = leaveRequestRepository;
         }
 
@@ -28,6 +26,12 @@ namespace LeaveManagement.Web.Controllers
         {
             var applicationDbContext = _context.LeaveRequests.Include(l => l.LeaveType);
             return View(await applicationDbContext.ToListAsync());
+        }
+
+        public async Task<ActionResult> MyLeave()
+        {
+            var model = await _leaveRequestRepository.GetMyLeaveDetails();
+            return View(model);
         }
 
         // GET: LeaveRequests/Details/5
