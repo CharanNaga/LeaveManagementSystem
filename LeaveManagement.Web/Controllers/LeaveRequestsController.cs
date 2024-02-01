@@ -6,6 +6,7 @@ using LeaveManagement.Web.Models;
 using AutoMapper;
 using LeaveManagement.Web.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using LeaveManagement.Web.Constants;
 
 namespace LeaveManagement.Web.Controllers
 {
@@ -22,10 +23,11 @@ namespace LeaveManagement.Web.Controllers
         }
 
         // GET: LeaveRequests
+        [Authorize(Roles = Roles.Administrator)]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.LeaveRequests.Include(l => l.LeaveType);
-            return View(await applicationDbContext.ToListAsync());
+            var model = await _leaveRequestRepository.GetAdminLeaveRequestList();
+            return View(model);
         }
 
         public async Task<ActionResult> MyLeave()
@@ -37,21 +39,44 @@ namespace LeaveManagement.Web.Controllers
         // GET: LeaveRequests/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.LeaveRequests == null)
+            var model = await _leaveRequestRepository.GetLeaveRequestAsync(id);
+
+            if(model == null)
             {
                 return NotFound();
             }
 
-            var leaveRequest = await _context.LeaveRequests
-                .Include(l => l.LeaveType)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            return View(model);
+        }
 
-            if (leaveRequest == null)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApproveRequest(int id, bool isApproved)
+        {
+            try
             {
-                return NotFound();
+                await _leaveRequestRepository.ChangeApprovalStatus(id, isApproved);
             }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return RedirectToAction(nameof(Index));
+        }
 
-            return View(leaveRequest);
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            try
+            {
+                await _leaveRequestRepository.CancelLeaveRequest(id);
+            }
+            catch(Exception ex)
+            {
+                throw;
+            }
+            return RedirectToAction(nameof(MyLeave));
         }
 
         // GET: LeaveRequests/Create
@@ -75,8 +100,10 @@ namespace LeaveManagement.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await _leaveRequestRepository.CreateLeaveRequest(leaveRequestCreateViewModel);
-                    return RedirectToAction(nameof(Index));
+                    var isValidRequest = await _leaveRequestRepository.CreateLeaveRequest(leaveRequestCreateViewModel);
+                    if (isValidRequest)
+                        return RedirectToAction(nameof(MyLeave));
+                    ModelState.AddModelError("Error", "You have exceeded your allocation with this request");
                 }
             }
             catch (Exception)
