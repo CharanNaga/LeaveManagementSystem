@@ -26,13 +26,17 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="LeaveRequests" asp-action="Create">Apply Leave</a>
-                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="LeaveRequests" asp-action="MyLeave">My Leave</a>
-                        </li>
+                        @if (User.IsInRole(Roles.User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="LeaveRequests" asp-action="Create">Apply For Leave</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="LeaveRequests" asp-action="MyLeave">My Leave</a>
+                            </li>
+                        }
 
                         @if (User.IsInRole(Roles.Administrator))
                         {
@@ -44,9 +48,7 @@
                                 <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Leave Management</a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" asp-controller="LeaveTypes" asp-action="Index">Leave Types</a></li>
-                                    <li><a class="dropdown-item" href="#">Leave Allocations</a></li>
-                                    <li><a class="dropdown-item" href="#">Leave Requests</a></li>
-                                    <li><a class="dropdown-item" href="#">Employee Management</a></li>
+                                    <li><a class="dropdown-item" asp-controller="LeaveRequests" asp-action="Index">Leave Requests</a></li>
                                 </ul>
                             </li>
                         }
@@ -75,10 +77,10 @@
     <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
     <script>
-        $(function(){
+        $(function () {
             $('.table').DataTable();
             $(".datepicker").datepicker({
-                dateFormat : "yy-mm-dd"
+                dateFormat: "yy-mm-dd"
             });
         });
     </script>
