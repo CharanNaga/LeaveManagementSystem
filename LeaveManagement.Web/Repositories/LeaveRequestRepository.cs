@@ -29,19 +29,99 @@ namespace LeaveManagement.Web.Repositories
             _leaveAllocationRepository = leaveAllocationRepository;
         }
 
-        public async Task CreateLeaveRequest(LeaveRequestCreateViewModel leaveRequestCreateViewModel)
+        public async Task CancelLeaveRequest(int leaveRequestId)
+        {
+            var leaveRequest = await GetAsync(leaveRequestId);
+            leaveRequest.IsCancelled = true;
+            await UpdateAsync(leaveRequest);
+        }
+
+        public async Task ChangeApprovalStatus(int leaveRequestId, bool isApproved)
+        {
+            var leaveRequest = await GetAsync(leaveRequestId);
+            leaveRequest.IsApproved = isApproved;
+
+            if(isApproved)
+            {
+                var allocation = await _leaveAllocationRepository.GetEmployeeAllocation(
+                    leaveRequest.RequestingEmployeeId, leaveRequestId
+                    );
+                int requestedDays = (int)(leaveRequest.EndDate - leaveRequest.StartDate).TotalDays;
+                allocation.NumberOfDays -= requestedDays;
+                await _leaveAllocationRepository.UpdateAsync(allocation);
+            }
+            await UpdateAsync(leaveRequest);
+        }
+
+        public async Task<bool> CreateLeaveRequest(LeaveRequestCreateViewModel leaveRequestCreateViewModel)
         {
             var user = await _userManager.GetUserAsync(_contextAccessor?.HttpContext?.User);
+
+            var leaveAllocation = await _leaveAllocationRepository.GetEmployeeAllocation(
+                user.Id, leaveRequestCreateViewModel.LeaveTypeId
+                );
+
+            if( leaveAllocation == null )
+            {
+                return false;
+            }
+
+            int daysRequested = (int)(
+                leaveRequestCreateViewModel.EndDate.Value - leaveRequestCreateViewModel.StartDate.Value
+                ).TotalDays;
+
+            if(daysRequested > leaveAllocation.NumberOfDays)
+            {
+                return false;
+            }
+
             var leaveRequest = _mapper.Map<LeaveRequest>(leaveRequestCreateViewModel);
             leaveRequest.RequestedDate = DateTime.Now;
             leaveRequest.RequestingEmployeeId = user.Id;
 
             await AddAsync(leaveRequest);
+            return true;
+        }
+
+        public async Task<AdminLeaveRequestViewModel> GetAdminLeaveRequestList()
+        {
+            var leaveRequests = await _db.LeaveRequests.Include(l => l.LeaveType).ToListAsync();
+            var model = new AdminLeaveRequestViewModel
+            {
+                TotalRequests = leaveRequests.Count,
+                ApprovedRequests = leaveRequests.Count(l => l.IsApproved == true),
+                PendingRequests = leaveRequests.Count(l => l.IsApproved == null),
+                RejectedRequests = leaveRequests.Count(l => l.IsApproved == false),
+                LeaveRequests = _mapper.Map<List<LeaveRequestViewModel>>(leaveRequests)
+            };
+
+            foreach (var leaveRequest in model.LeaveRequests)
+            {
+                leaveRequest.Employee = _mapper.Map<EmployeeListViewModel>
+                    (await _userManager.FindByIdAsync(leaveRequest.RequestingEmployeeId));
+            }
+            return model;
         }
 
         public async Task<List<LeaveRequest>> GetAllAsync(string employeeId)
         {
             return await _db.LeaveRequests.Where(l => l.RequestingEmployeeId == employeeId).ToListAsync();
+        }
+
+        public async Task<LeaveRequestViewModel?> GetLeaveRequestAsync(int? id)
+        {
+            var leaveRequest = await _db.LeaveRequests.Include(l => l.LeaveType)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (leaveRequest == null)
+                return null;
+
+            var model = _mapper.Map<LeaveRequestViewModel>(leaveRequest);
+
+            model.Employee = _mapper.Map<EmployeeListViewModel>
+                (await _userManager.FindByIdAsync(leaveRequest?.RequestingEmployeeId));
+
+            return model;
         }
 
         public async Task<EmployeeLeaveRequestViewModel> GetMyLeaveDetails()
