@@ -13,9 +13,9 @@ namespace LeaveManagement.Web.Data
 
         public DateTime RequestedDate { get; set; }
 
-        public string RequestComments { get; set; }
+        public string? RequestComments { get; set; }
 
-        public bool? IsAppoved { get; set; }
+        public bool? IsApproved { get; set; }
         public bool IsCancelled { get; set; }
 
         public string RequestingEmployeeId { get; set; }
