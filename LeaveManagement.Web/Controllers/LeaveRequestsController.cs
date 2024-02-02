@@ -14,11 +14,15 @@ namespace LeaveManagement.Web.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILeaveRequestRepository _leaveRequestRepository;
+        private readonly ILeaveTypeRepository _leaveTypeRepository;
+        private readonly ILogger<LeaveRequestsController> _logger;
 
-        public LeaveRequestsController(ApplicationDbContext context, ILeaveRequestRepository leaveRequestRepository)
+        public LeaveRequestsController(ApplicationDbContext context, ILeaveRequestRepository leaveRequestRepository,ILeaveTypeRepository leaveTypeRepository, ILogger<LeaveRequestsController> logger)
         {
             _context = context;
             _leaveRequestRepository = leaveRequestRepository;
+            _leaveTypeRepository = leaveTypeRepository;
+            _logger = logger;
         }
 
         // GET: LeaveRequests
@@ -58,6 +62,7 @@ namespace LeaveManagement.Web.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, "Error While Performing Approve Leave Request");
                 throw;
             }
             return RedirectToAction(nameof(Index));
@@ -73,17 +78,18 @@ namespace LeaveManagement.Web.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, "Error While Performing Cancel Leave Request");
                 throw;
             }
             return RedirectToAction(nameof(MyLeave));
         }
 
         // GET: LeaveRequests/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             var model = new LeaveRequestCreateViewModel
             {
-                LeaveTypes = new SelectList(_context.LeaveTypes, "Id", "Name")
+                LeaveTypes = new SelectList(await _leaveTypeRepository.GetAllAsync(), "Id", "Name")
             };
             return View(model);
         }
@@ -105,12 +111,13 @@ namespace LeaveManagement.Web.Controllers
                     ModelState.AddModelError("Error", "You have exceeded your allocation with this request");
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message, "Error While Creating Leave Request");
                 ModelState.AddModelError("Error", "Something error occurred");
             }
 
-            leaveRequestCreateViewModel.LeaveTypes = new SelectList(_context.LeaveTypes, "Id", "Name", leaveRequestCreateViewModel.LeaveTypeId);
+            leaveRequestCreateViewModel.LeaveTypes = new SelectList(await _leaveTypeRepository.GetAllAsync(), "Id", "Name", leaveRequestCreateViewModel.LeaveTypeId);
             return View(leaveRequestCreateViewModel);
         }
 
@@ -127,7 +134,7 @@ namespace LeaveManagement.Web.Controllers
             {
                 return NotFound();
             }
-            ViewData["LeaveTypeId"] = new SelectList(_context.LeaveTypes, "Id", "Name", leaveRequest.LeaveTypeId);
+            ViewData["LeaveTypeId"] = new SelectList(await _leaveTypeRepository.GetAllAsync(), "Id", "Name", leaveRequest.LeaveTypeId);
             return View(leaveRequest);
         }
 
@@ -163,7 +170,7 @@ namespace LeaveManagement.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["LeaveTypeId"] = new SelectList(_context.LeaveTypes, "Id", "Name", leaveRequest.LeaveTypeId);
+            ViewData["LeaveTypeId"] = new SelectList(await _leaveTypeRepository.GetAllAsync(), "Id", "Name", leaveRequest.LeaveTypeId);
             return View(leaveRequest);
         }
 
