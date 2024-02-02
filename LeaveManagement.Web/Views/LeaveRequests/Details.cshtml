@@ -73,7 +73,7 @@
     @if (Model.IsApproved == null)
     {
         <div class="col">
-            <form asp-action="ApproveRequest">
+            <form asp-action="ApproveRequest" class="form-inline">
                 <input name="Id" value="@Model.Id" type="hidden" />
                 <input name="isApproved" type="hidden" value="true" />
                 <button type="submit" class="btn btn-success btn-lg">Approve</button>
@@ -82,12 +82,11 @@
 
             <div class="col">
 
-            <form asp-action="ApproveRequest">
+            <form asp-action="ApproveRequest" class="form-inline">
                 <input name="Id" value="@Model.Id" type="hidden" />
                 <input name="isApproved" type="hidden" value="false" />
                 <button type="submit" class="btn btn-danger btn-lg">Reject</button>
             </form>
-            
         </div>
     }
     <div class="col">
