@@ -5,6 +5,12 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveManagement.Web", "LeaveManagement.Web\LeaveManagement.Web.csproj", "{4B4921C2-5412-4429-A354-123EF6C6A8E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveManagement.Data", "LeaveManagement.Data\LeaveManagement.Data.csproj", "{B0473C98-5F82-4AFF-AEF0-3D2197F53521}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveManagement.Common", "LeaveManagement.Common\LeaveManagement.Common.csproj", "{44267B6B-E79E-4662-A135-53707A1C9068}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveManagement.Application", "LeaveManagement.Application\LeaveManagement.Application.csproj", "{85580CAD-C7F9-457D-859B-96F9F5290C5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +21,18 @@ Global
 		{4B4921C2-5412-4429-A354-123EF6C6A8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B4921C2-5412-4429-A354-123EF6C6A8E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B4921C2-5412-4429-A354-123EF6C6A8E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0473C98-5F82-4AFF-AEF0-3D2197F53521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0473C98-5F82-4AFF-AEF0-3D2197F53521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0473C98-5F82-4AFF-AEF0-3D2197F53521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0473C98-5F82-4AFF-AEF0-3D2197F53521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44267B6B-E79E-4662-A135-53707A1C9068}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44267B6B-E79E-4662-A135-53707A1C9068}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44267B6B-E79E-4662-A135-53707A1C9068}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44267B6B-E79E-4662-A135-53707A1C9068}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85580CAD-C7F9-457D-859B-96F9F5290C5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85580CAD-C7F9-457D-859B-96F9F5290C5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85580CAD-C7F9-457D-859B-96F9F5290C5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85580CAD-C7F9-457D-859B-96F9F5290C5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

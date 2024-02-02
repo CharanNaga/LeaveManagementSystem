@@ -8,13 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.15" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.26" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.26" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.26" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.26">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.26">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -22,6 +16,10 @@
     <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
     <PackageReference Include="Serilog.Expressions" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="7.0.0-dev-00276" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LeaveManagement.Application\LeaveManagement.Application.csproj" />
   </ItemGroup>
 
 </Project>
