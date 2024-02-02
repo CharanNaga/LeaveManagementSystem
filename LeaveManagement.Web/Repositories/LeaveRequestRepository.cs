@@ -58,7 +58,7 @@ namespace LeaveManagement.Web.Repositories
             if(isApproved)
             {
                 var allocation = await _leaveAllocationRepository.GetEmployeeAllocation(
-                    leaveRequest.RequestingEmployeeId, leaveRequestId
+                    leaveRequest.RequestingEmployeeId, leaveRequest.LeaveTypeId
                     );
                 int requestedDays = (int)(leaveRequest.EndDate - leaveRequest.StartDate).TotalDays;
                 allocation.NumberOfDays -= requestedDays;
@@ -113,7 +113,7 @@ namespace LeaveManagement.Web.Repositories
 
         public async Task<AdminLeaveRequestViewModel> GetAdminLeaveRequestList()
         {
-            var leaveRequests = await _db.LeaveRequests.Include(l => l.LeaveType).ToListAsync();
+            var leaveRequests = await _db.LeaveRequests.Include(l => l.LeaveType).Where(l=>l.IsCancelled == false).ToListAsync();
             var model = new AdminLeaveRequestViewModel
             {
                 TotalRequests = leaveRequests.Count,
