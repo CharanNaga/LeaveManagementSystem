@@ -1,4 +1,5 @@
 ﻿using LeaveManagement.Web.Models;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -26,7 +27,16 @@ namespace LeaveManagement.Web.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var requestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var exceptionalHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+
+            if(exceptionalHandlerPathFeature != null)
+            {
+                Exception exception = exceptionalHandlerPathFeature.Error;
+                _logger.LogError(exception, $"Error encountered by User : {this.User?.Identity?.Name} | Request Id: {requestId}");
+            }
+
+            return View(new ErrorViewModel { RequestId = requestId });
         }
     }
 }
