@@ -96,9 +96,9 @@
                     }
                 </td>
                 <td>
-                    @if(item.IsApproved == null)
+                    @if(item.IsApproved == null && !item.IsCancelled)
                     {
-                       <form>
+                       <form asp-action="Cancel" asp-route-id="@item.Id">
                            <input asp-form="@item.Id" type="hidden" />
                            <button type="submit" class="btn btn-danger btn-sm">Cancel Request</button>
                        </form>
