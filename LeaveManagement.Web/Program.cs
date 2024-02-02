@@ -6,6 +6,7 @@ using LeaveManagement.Web.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,9 +32,19 @@ builder.Services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
 
 builder.Services.AddAutoMapper(typeof(MapperConfig)); //Adding customized automapper config class to the Ioc container
 
+builder.Host.UseSerilog(
+    (context,services,configuration) =>
+    {
+        configuration.WriteTo.Console()
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services);
+    });
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
