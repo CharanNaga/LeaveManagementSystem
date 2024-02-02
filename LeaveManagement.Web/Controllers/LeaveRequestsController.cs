@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using LeaveManagement.Web.Constants;
+using LeaveManagement.Web.Contracts;
 using LeaveManagement.Web.Data;
 using LeaveManagement.Web.Models;
-using AutoMapper;
-using LeaveManagement.Web.Contracts;
 using Microsoft.AspNetCore.Authorization;
-using LeaveManagement.Web.Constants;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace LeaveManagement.Web.Controllers
 {
@@ -41,7 +40,7 @@ namespace LeaveManagement.Web.Controllers
         {
             var model = await _leaveRequestRepository.GetLeaveRequestAsync(id);
 
-            if(model == null)
+            if (model == null)
             {
                 return NotFound();
             }
@@ -72,7 +71,7 @@ namespace LeaveManagement.Web.Controllers
             {
                 await _leaveRequestRepository.CancelLeaveRequest(id);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -110,7 +109,7 @@ namespace LeaveManagement.Web.Controllers
             {
                 ModelState.AddModelError("Error", "Something error occurred");
             }
-            
+
             leaveRequestCreateViewModel.LeaveTypes = new SelectList(_context.LeaveTypes, "Id", "Name", leaveRequestCreateViewModel.LeaveTypeId);
             return View(leaveRequestCreateViewModel);
         }
@@ -201,14 +200,14 @@ namespace LeaveManagement.Web.Controllers
             {
                 _context.LeaveRequests.Remove(leaveRequest);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool LeaveRequestExists(int id)
         {
-          return (_context.LeaveRequests?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.LeaveRequests?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
