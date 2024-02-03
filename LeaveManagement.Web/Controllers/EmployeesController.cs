@@ -7,9 +7,11 @@ using LeaveManagement.Application.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LeaveManagement.Web.Controllers
 {
+    [Authorize(Roles =Roles.Administrator)]
     public class EmployeesController : Controller
     {
         private readonly UserManager<Employee> _userManager;
